@@ -16,23 +16,27 @@ export default function Home() {
   const [emojis, setEmojis] = useState<EmojisProps[]>([]);
   const [randomEmoji, setRandomEmoji] = useState<EmojisProps | null>(null);
 
-  const getImage = async () => {
-    try {
-      const { data } = await axios.get<EmojisProps[]>(BASE_API);
-      setEmojis(data);
-    } catch (error) {
-      console.error("Error fetching emojis:", error);
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get<EmojisProps[]>(BASE_API);
+        setEmojis(data);
+        if (data.length > 0) {
+          const randomIndex = Math.floor(Math.random() * data.length);
+          setRandomEmoji(data[randomIndex]);
+        }
+      } catch (error) {
+        console.error("Error fetching emojis:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleRandomEmoji = () => {
     const randomIndex = Math.floor(Math.random() * emojis.length);
     setRandomEmoji(emojis[randomIndex]);
   };
-
-  useEffect(() => {
-    getImage();
-  }, []);
 
   return (
     <main className="mx-auto my-0 bg-[#FAF4E1]">
