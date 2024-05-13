@@ -1,14 +1,16 @@
 "use client";
-import React, { useState } from "react";
-import { useEmojiContext } from "@/context/EmojiContext";
-import { EmojisProps } from "@/context/EmojiContext";
+import React, { useEffect } from "react";
+import { useEmoji } from "@/context/EmojiContext";
 
-const Home: React.FC = () => {
-  const { getRandomEmoji } = useEmojiContext();
-  const [randomEmoji, setRandomEmoji] = useState<EmojisProps | null>(null);
+const HomeComp: React.FC = () => {
+  const { randomEmoji, fetchEmojis, getRandomEmoji } = useEmoji();
+
+  useEffect(() => {
+    fetchEmojis();
+  }, []);
 
   const handleRandomEmoji = () => {
-    setRandomEmoji(getRandomEmoji());
+    getRandomEmoji();
   };
 
   return (
@@ -32,7 +34,7 @@ const Home: React.FC = () => {
               {randomEmoji && (
                 <>
                   <div
-                    className="text-7xl cursor-pointer"
+                    className="emoji-container text-7xl cursor-pointer"
                     onClick={handleRandomEmoji}
                     dangerouslySetInnerHTML={{
                       __html: randomEmoji.htmlCode[0],
@@ -51,4 +53,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default HomeComp;

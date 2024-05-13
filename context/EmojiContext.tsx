@@ -1,9 +1,8 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import React, { createContext, useState, useContext, ReactNode } from "react";
 
-// Define the EmojisProps interface
-export interface EmojisProps {
+interface EmojiData {
   name: string;
   category: string;
   group: string;
@@ -11,31 +10,38 @@ export interface EmojisProps {
   unicode: string[];
 }
 
-interface EmojiContextProps {
-  emojis: EmojisProps[];
-  getRandomEmoji: () => EmojisProps | null;
+interface EmojiContextType {
+  emojis: EmojiData[];
+  randomEmoji: EmojiData | null;
+  fetchEmojis: () => void;
+  getRandomEmoji: () => void;
 }
 
-const EmojiContext = createContext<EmojiContextProps | undefined>(undefined);
+const EmojiContext = createContext<EmojiContextType>({
+  emojis: [],
+  randomEmoji: null,
+  fetchEmojis: () => {},
+  getRandomEmoji: () => {},
+});
 
-export const useEmojiContext = () => {
-  const context = useContext(EmojiContext);
-  if (!context) {
-    throw new Error("useEmojiContext must be used within an EmojiProvider");
-  }
-  return context;
-};
+interface EmojiProviderProps {
+  children: ReactNode;
+}
 
-export const EmojiProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const EmojiProvider: React.FC<EmojiProviderProps> = ({ children }) => {
   const BASE_API = `https://emojihub.yurace.pro/api/all`;
-  const [emojis, setEmojis] = useState<EmojisProps[]>([]);
+
+  const [emojis, setEmojis] = useState<EmojiData[]>([]);
+  const [randomEmoji, setRandomEmoji] = useState<EmojiData | null>(null);
 
   const fetchEmojis = async () => {
     try {
-      const { data } = await axios.get<EmojisProps[]>(BASE_API);
+      const { data } = await axios.get<EmojiData[]>(BASE_API);
       setEmojis(data);
+      if (data.length > 0) {
+        const randomIndex = Math.floor(Math.random() * data.length);
+        setRandomEmoji(data[randomIndex]);
+      }
     } catch (error) {
       console.error("Error fetching emojis:", error);
     }
@@ -43,16 +49,15 @@ export const EmojiProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getRandomEmoji = () => {
     const randomIndex = Math.floor(Math.random() * emojis.length);
-    return emojis[randomIndex];
+    setRandomEmoji(emojis[randomIndex]);
   };
 
-  useEffect(() => {
-    fetchEmojis();
-  }, []);
-
   return (
-    <EmojiContext.Provider value={{ emojis, getRandomEmoji }}>
+    <EmojiContext.Provider
+      value={{ emojis, randomEmoji, fetchEmojis, getRandomEmoji }}>
       {children}
     </EmojiContext.Provider>
   );
 };
+
+export const useEmoji = () => useContext(EmojiContext);
