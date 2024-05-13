@@ -1,3 +1,4 @@
+/*
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -75,15 +76,16 @@ export default function Home() {
     </main>
   );
 }
+*/
 
-// import React from "react";
-// import { EmojiProvider } from "@/context/EmojiContext";
-// import HomeComp from "./_components/HomeComp";
+import React from "react";
+import { EmojiProvider } from "@/context/EmojiContext";
+import HomeComp from "./_components/HomeComp";
 
-// export default function Home() {
-//   return (
-//     <EmojiProvider>
-//       <HomeComp />
-//     </EmojiProvider>
-//   );
-// }
+export default function Home() {
+  return (
+    <EmojiProvider>
+      <HomeComp />
+    </EmojiProvider>
+  );
+}
